@@ -54,8 +54,6 @@ app.post('/users/signin', function (req, res) {
     }
     // JWT (avec sa signature)
     jwtoken = jwt.sign(payload, secret_key, header)
-    console.log(jwtoken)
-
     // génération du cookie comprenant le JWT
     res.cookie('accessToken', jwtoken, {
       httpOnly: true,
@@ -65,8 +63,7 @@ app.post('/users/signin', function (req, res) {
     // réponse au client
     return res.json({
       user: { username: username },
-      xsrf_token: xsrfToken,
-      jwt: jwtoken
+      xsrf_token: xsrfToken
     });
     } else {
       return res.status(401).json({ message: "id incorrect" });
