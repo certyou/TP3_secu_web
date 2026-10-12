@@ -23,9 +23,11 @@ const authMiddleware = function (req, res, next) {
     try {
         // 2. verifier sa signature et sa date d'expiration
         const decoded = jwt.verify(token, SECRET_KEY);
-        const xsrfTokenHeader = req.headers['x-xsrf-token'];
-        if (!xsrfTokenHeader || xsrfTokenHeader !== decoded.xsrfToken) {
-            return res.status(401).json({ message: "Accès refusé : Jeton CSRF invalide ou manquant." });
+        const xsrfTokenHeader = req.headers.authorization;
+        console.log(xsrfTokenHeader)
+        decoded_xsrfToken = `Bearer ${decoded.xsrfToken}`
+        if (!xsrfTokenHeader || xsrfTokenHeader !== decoded_xsrfToken) {
+            return res.status(401).json({ message: `Accès refusé : Jeton CSRF invalide ou manquant (${xsrfTokenHeader} =/= ${decoded_xsrfToken}).` });
         }
         req.user = decoded;
         next();
