@@ -1,0 +1,23 @@
+info:
+  name: JWT_1
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: http://localhost:4000/users/signin
+  body:
+    type: json
+    data: |-
+      {
+        "username": "alice",
+        "password": "password1"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
