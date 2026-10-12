@@ -1,0 +1,10 @@
+$kind: http-request
+name: http://localhost:4000/users/getlist
+description: ""
+url: http://localhost:4000/users/getlist
+method: GET
+headers:
+  token: aae411bc173894941063c83e1cc50a3a6cdf4cdbe152d3acea902bcb68fc238f
+body:
+  type: urlencoded
+order: 2000
