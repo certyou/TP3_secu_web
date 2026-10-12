@@ -23,10 +23,9 @@ const authMiddleware = function (req, res, next) {
     try {
         // 2. verifier sa signature et sa date d'expiration
         const decoded = jwt.verify(token, secret_key);
-        const xsrfTokenHeader = req.headers.authorization;
-        decoded_xsrfToken = `Bearer ${decoded.token}`
-        if (!xsrfTokenHeader || xsrfTokenHeader !== decoded_xsrfToken) {
-            return res.status(401).json({ message: "invalid token" });
+        const xsrfTokenHeader = req.headers['token'];
+        if (!xsrfTokenHeader || xsrfTokenHeader !== decoded.token) {
+            return res.status(401).json({ message: "token invalid" });
         }
         req.user = decoded;
         next();
@@ -34,7 +33,6 @@ const authMiddleware = function (req, res, next) {
         return res.status(401).json({ message: "token error" });
     }
 };
-
 app.post('/users/signin', function (req, res) {
     // check user creds
     const { username, password } = req.body;
@@ -48,12 +46,15 @@ app.post('/users/signin', function (req, res) {
             token: token_csrf,
             exp: Math.floor(expiredAt/1000)
         };
+        // signature du payload
         const token = jwt.sign(payload, secret_key);
+        // génération du cookie
         res.cookie('accessToken', token, {
             httpOnly: true,
             secure: false,
             sameSite: 'strict'
         });
+        // réponse au client
         return res.json({
             user: { username: username },
             token: token_csrf,
