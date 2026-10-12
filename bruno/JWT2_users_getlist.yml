@@ -1,5 +1,5 @@
 info:
-  name: JWT_2
+  name: JWT2_users_getlist
   type: http
   seq: 3
 
@@ -8,13 +8,7 @@ http:
   url: http://localhost:4000/users/getlist
   headers:
     - name: Authorization
-      value: Bearer bc1a7e5d9aa4ce9ec757fff208101371efa34e71726cbf40ad4a1af5a0d70447
-  body:
-    type: json
-    data: |-
-      {
-        "username": "alice"
-      }
+      value: Bearer 1b19a0c16846ee874ae6622290e7ba193cf433b3df4b1cccd45e49822c2375d1
 
 settings:
   encodeUrl: true

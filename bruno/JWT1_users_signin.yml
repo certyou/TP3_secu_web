@@ -1,5 +1,5 @@
 info:
-  name: JWT_1
+  name: JWT1_users_signin
   type: http
   seq: 2
 
