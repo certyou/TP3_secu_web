@@ -17,7 +17,6 @@ const users = {
 const authMiddleware = function (req, res, next) {
   // 1. recuperer le jeton (en-tete Authorization ou cookie)
   const cookie = req.cookies.accessToken;
-  //console.log(jwtoken_cookie)
   if (!cookie) {
     return res.status(401).json({ message: "no token" });
   }
@@ -26,9 +25,8 @@ const authMiddleware = function (req, res, next) {
     const decoded_cookie = jwt.verify(cookie, secret_key, { algorithm: 'HS256' })
     const xsrf_token_cookie = `Bearer ${decoded_cookie.xsrf_token}`
     const xsrf_token_header = req.headers.authorization;
-    //print(xsrf_token_header)
     if (!xsrf_token_header || xsrf_token_header !== xsrf_token_cookie) {
-      return res.status(401).json({ message: `token invalid (${xsrf_token_header} =/= ${xsrf_token_cookie}` });
+      return res.status(401).json({ message: `token invalid` });
     }
     req.user = decoded_cookie;
     next();
@@ -36,6 +34,7 @@ const authMiddleware = function (req, res, next) {
       return res.status(401).json({ message: `token error : ${error}` });
   }
 };
+
 app.post('/users/signin', function (req, res) {
     // check user creds
     const { username, password } = req.body;
@@ -94,14 +93,3 @@ app.get('/users/logout', (req, res) => {
 app.listen(port, () => {
     console.log(`server started: http://localhost:${port}`);
 });
-
-/*
-// add expiration (1h)
-const expiredAt = moment().add(1, 'hours').valueOf();
-const jwtoken_payload = {
-    username: username,
-    x_xsrf_token: xsrfToken,
-    exp: Math.floor(expiredAt/1000)
-};
-// signature du payload
-const jwtoken = jwt.sign(jwtoken_payload, secret_key);*/
