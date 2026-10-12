@@ -35,9 +35,12 @@ const authMiddleware = function (req, res, next) {
 };
 
 app.post('/users/signin', function (req, res) {
+    // check user creds
     const { username, password } = req.body;
     if (users[username] && users[username] === password) {
+        // generate csrf token
         const token_csrf = crypto.randomBytes(32).toString('hex');
+        // add expiration (1h)
         const expiredAt = moment().add(1, 'hours').valueOf();
         const payload = {
             username: username,
