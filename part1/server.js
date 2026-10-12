@@ -10,16 +10,18 @@ app.use(express.json());
 app.use(cookieParser());
 const SECRET_KEY = "secret";
 const USERS = {
-    "alice": "aa",
-    "bob": "bb"
+    "alice": "password1",
+    "bob": "password2"
 };
 
 const authMiddleware = function (req, res, next) {
+  // 1. recuperer le jeton (en-tete Authorization ou cookie)
     const token = req.cookies.accessToken;
     if (!token) {
         return res.status(401).json({ message: "Accès refusé : Aucun jeton fourni." });
     }
     try {
+        // 2. verifier sa signature et sa date d'expiration
         const decoded = jwt.verify(token, SECRET_KEY);
         const xsrfTokenHeader = req.headers['x-xsrf-token'];
         if (!xsrfTokenHeader || xsrfTokenHeader !== decoded.xsrfToken) {
@@ -64,9 +66,9 @@ app.get('/users/getList', authMiddleware, (req, res) => {
 });
 
 app.get('/verifyToken', authMiddleware, (req, res) => {
-    res.json({ 
-        message: "Le jeton est valide.", 
-        user: req.user.username 
+    res.json({
+        message: "Le jeton est valide.",
+        user: req.user.username
     });
 });
 
