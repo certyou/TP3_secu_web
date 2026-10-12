@@ -16,58 +16,67 @@ const users = {
 
 const authMiddleware = function (req, res, next) {
   // 1. recuperer le jeton (en-tete Authorization ou cookie)
-    const token = req.cookies.accessToken;
-    if (!token) {
-        return res.status(401).json({ message: "no token" });
+  const cookie = req.cookies.accessToken;
+  //console.log(jwtoken_cookie)
+  if (!cookie) {
+    return res.status(401).json({ message: "no token" });
+  }
+  try {
+    // 2. verifier sa signature et sa date d'expiration
+    const decoded_cookie = jwt.verify(cookie, secret_key, { algorithm: 'HS256' })
+    const xsrf_token_cookie = `Bearer ${decoded_cookie.xsrf_token}`
+    const xsrf_token_header = req.headers.authorization;
+    //print(xsrf_token_header)
+    if (!xsrf_token_header || xsrf_token_header !== xsrf_token_cookie) {
+      return res.status(401).json({ message: `token invalid (${xsrf_token_header} =/= ${xsrf_token_cookie}` });
     }
-    try {
-        // 2. verifier sa signature et sa date d'expiration
-        const decoded = jwt.verify(token, secret_key);
-        const xsrfTokenHeader = req.headers['token'];
-        if (!xsrfTokenHeader || xsrfTokenHeader !== decoded.token) {
-            return res.status(401).json({ message: "token invalid" });
-        }
-        req.user = decoded;
-        next();
-    } catch (error) {
-        return res.status(401).json({ message: "token error" });
-    }
+    req.user = decoded_cookie;
+    next();
+  } catch (error) {
+      return res.status(401).json({ message: `token error : ${error}` });
+  }
 };
 app.post('/users/signin', function (req, res) {
     // check user creds
     const { username, password } = req.body;
-    if (users[username] && users[username] === password) {
-        // generate csrf token
-        const token_csrf = crypto.randomBytes(32).toString('hex');
-        // add expiration (1h)
-        const expiredAt = moment().add(1, 'hours').valueOf();
-        const payload = {
-            username: username,
-            token: token_csrf,
-            exp: Math.floor(expiredAt/1000)
-        };
-        // signature du payload
-        const token = jwt.sign(payload, secret_key);
-        // génération du cookie
-        res.cookie('accessToken', token, {
-            httpOnly: true,
-            secure: false,
-            sameSite: 'strict'
-        });
-        // réponse au client
-        return res.json({
-            user: { username: username },
-            token: token_csrf,
-            expiredAt: expiredAt
-        });
+  if (users[username] && users[username] === password) {
+    // génération CSRF
+    const xsrfToken = crypto.randomBytes(32).toString('hex');
+    // header du JWT
+    header = {
+      algorithm: 'HS256'
+    }
+    // payload du JWT
+    payload = {
+      username: username,
+      xsrf_token: xsrfToken,
+      iat: Math.floor(Date.now() / 1000),               // date génération
+      exp: Math.floor(Date.now() / 1000) + (60 * 60),   // date expiration
+    }
+    // JWT (avec sa signature)
+    jwtoken = jwt.sign(payload, secret_key, header)
+    console.log(jwtoken)
+
+    // génération du cookie comprenant le JWT
+    res.cookie('accessToken', jwtoken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict'
+    });
+    // réponse au client
+    return res.json({
+      user: { username: username },
+      xsrf_token: xsrfToken,
+      jwt: jwtoken
+    });
     } else {
-        return res.status(401).json({ message: "id incorrect" });
+      return res.status(401).json({ message: "id incorrect" });
     }
 });
 
 app.get('/users/getList', authMiddleware, (req, res) => {
-    const userList = Object.keys(users).map(name => ({ username: name }));
-    res.json({ userlist: userList });
+  const userList = Object.keys(users).map(name => ({ username: name }));
+  res.json({ userlist: userList });
 });
 
 app.get('/verifyToken', authMiddleware, (req, res) => {
@@ -85,3 +94,14 @@ app.get('/users/logout', (req, res) => {
 app.listen(port, () => {
     console.log(`server started: http://localhost:${port}`);
 });
+
+/*
+// add expiration (1h)
+const expiredAt = moment().add(1, 'hours').valueOf();
+const jwtoken_payload = {
+    username: username,
+    x_xsrf_token: xsrfToken,
+    exp: Math.floor(expiredAt/1000)
+};
+// signature du payload
+const jwtoken = jwt.sign(jwtoken_payload, secret_key);*/
