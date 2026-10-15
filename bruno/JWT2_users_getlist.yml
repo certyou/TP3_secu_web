@@ -8,7 +8,7 @@ http:
   url: http://localhost:4000/users/getlist
   headers:
     - name: Authorization
-      value: Bearer f57ee084ea3352beedd1409a1b77d013f953e62d67e531e478830411a2055146
+      value: Bearer fcaeaf56de0b985f52519c970289c2dec6da53b83b363745483c0a285f0e6e83
 
 settings:
   encodeUrl: true

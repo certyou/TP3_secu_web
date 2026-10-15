@@ -1,0 +1,31 @@
+info:
+  name: KC5_token_auth
+  type: http
+  seq: 10
+
+http:
+  method: POST
+  url: http://localhost:8180/realms/realmtest/protocol/openid-connect/token
+  body:
+    type: form-urlencoded
+    data:
+      - name: client_id
+        value: employee-management-api
+      - name: client_secret
+        value: 6WhDV1NSThyasRR4Akgk6HGN2RmEHlHf
+      - name: grant_type
+        value: authorization_code
+      - name: scope
+        value: openid
+      - name: code
+        value: 5c044811-813c-4b8b-acae-2e2af0e3250b.bb0c3636-8d36-42f6-8e53-f62ed488a4b3.83f2ec5c-746c-44f5-901d-e39cd8bb5f71
+      - name: redirect_uri
+        value: http://localhost:9090/login/oauth2/code/employee-management-api
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
