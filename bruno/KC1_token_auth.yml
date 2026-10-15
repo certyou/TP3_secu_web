@@ -1,0 +1,31 @@
+info:
+  name: KC1_token_auth
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: http://localhost:8180/realms/realmtest/protocol/openid-connect/token
+  body:
+    type: form-urlencoded
+    data:
+      - name: username
+        value: test-user
+      - name: password
+        value: password1
+      - name: client_id
+        value: employee-management-api
+      - name: client_secret
+        value: 6WhDV1NSThyasRR4Akgk6HGN2RmEHlHf
+      - name: grant_type
+        value: password
+      - name: scope
+        value: openid
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
